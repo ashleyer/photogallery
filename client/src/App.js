@@ -20,9 +20,11 @@ class App extends Component {
     });
 
     axios.get('http://localhost:4000').then(({ data }) => {
-      this.setState({
-        images: [...data, ...this.state.images],
-        loading: false,
+      this.setState(prevState => {
+        return {
+          images: [...data, ...prevState.images],
+          loading: false,
+        };
       });
     });
 
@@ -33,8 +35,10 @@ class App extends Component {
 
     const channel = pusher.subscribe('gallery');
     channel.bind('upload', data => {
-      this.setState({
-        images: [data.image, ...this.state.images],
+      this.setState(prevState => {
+        return {
+          images: [data.image, ...this.state.images],
+        };
       });
     });
   }
@@ -53,12 +57,21 @@ class App extends Component {
       loading: true,
     });
 
+    // console.log('selectedFile', this.state.selectedFile);
+    // console.log('selectedFile.name', this.state.selectedFile.name);
+    
+
     const formData = new FormData();
     formData.append(
       'image',
       this.state.selectedFile,
       this.state.selectedFile.name
     );
+    // const formData = { 
+    //   filename: this.state.selectedFile.name
+    // };
+
+    //console.log('FORMDATA', formData);
 
     axios.post('http://localhost:4000/upload', formData).then(({ data }) => {
       this.setState({
@@ -78,7 +91,7 @@ class App extends Component {
       <div className="App">
         <h1 className="App-title">Rita Barry's Gallery</h1>
 
-        <form method="post" onSubmit={this.uploadImage}>
+        <form id="myform" method="post" encType="multipart/form-data" onSubmit={this.uploadImage}>
           <label className="label" htmlFor="gallery-image">
             Choose an image to upload
           </label>
